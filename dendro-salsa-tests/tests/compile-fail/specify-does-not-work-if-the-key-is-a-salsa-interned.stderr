@@ -6,7 +6,7 @@ error[E0277]: the trait bound `MyInterned: TrackedStructInDb<dyn Db>` is not sat
    |
    = help: the trait `TrackedStructInDb<DB>` is implemented for `MyTracked`
 note: required by a bound in `function::specify::<impl FunctionIngredient<C>>::specify_and_record`
-  --> $WORKSPACE/components/salsa-2022/src/function/specify.rs
+  --> $WORKSPACE/components/dendro-salsa/src/function/specify.rs
    |
    |     pub fn specify_and_record<'db>(&self, db: &'db DynDb<'db, C>, key: C::Key, value: C::Value)
    |            ------------------ required by a bound in this associated function

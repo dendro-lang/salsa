@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 derive-new = "0.5.9"
-salsa = { path = "../../components/salsa-2022", package = "salsa-2022" }
+salsa = { path = "../../components/dendro-salsa", package = "dendro-salsa" }
 ordered-float = "3.0"
 
 [dev-dependencies]

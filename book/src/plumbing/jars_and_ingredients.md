@@ -35,8 +35,8 @@ For example, a tracked function generates a [`FunctionIngredient`].
 A tracked struct, however, generates several ingredients, one for the struct itself (a [`TrackedStructIngredient`],
 and one [`FunctionIngredient`] for each value field.
 
-[`FunctionIngredient`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/function.rs#L42
-[`TrackedStructIngredient`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/tracked_struct.rs#L18
+[`FunctionIngredient`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/function.rs#L42
+[`TrackedStructIngredient`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/tracked_struct.rs#L18
 
 ### Ingredients define the core logic of Salsa
 
@@ -47,16 +47,16 @@ Similarly, when you call a tracked function, that is translated into a call to [
 which decides whether there is a valid memoized value to return,
 or whether the function must be executed.
 
-[`TrackedStruct::new_struct`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/tracked_struct.rs#L76
-[`TrackedFunction::fetch`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/function/fetch.rs#L15
+[`TrackedStruct::new_struct`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/tracked_struct.rs#L76
+[`TrackedFunction::fetch`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/function/fetch.rs#L15
 
 ### The `Ingredient` trait
 
 Each ingredient implements the [`Ingredient<DB>`] trait, which defines generic operations supported by any kind of ingredient.
 For example, the method `maybe_changed_after` can be used to check whether some particular piece of data stored in the ingredient may have changed since a given revision:
 
-[`Ingredient<DB>`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/ingredient.rs#L15
-[`maybe_changed_after`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/ingredient.rs#L21-L22
+[`Ingredient<DB>`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/ingredient.rs#L15
+[`maybe_changed_after`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/ingredient.rs#L21-L22
 
 We'll see below that each database `DB` is able to take an `IngredientIndex` and use that to get an `&dyn Ingredient<DB>` for the corresponding ingredient.
 This allows the database to perform generic operations on an indexed ingredient without knowing exactly what the type of that ingredient is.
@@ -117,7 +117,7 @@ struct MyDatabase {
 ...the `salsa::db` macro would generate a `HasJars` impl that (among other things) contains `type Jars = (Jar1, ..., JarN)`:
 
 ```rust,ignore
-{{#include ../../../components/salsa-2022-macros/src/db.rs:HasJars}}
+{{#include ../../../components/dendro-salsa-macros/src/db.rs:HasJars}}
 ```
 
 In turn, the `salsa::Storage<DB>` type ultimately contains a struct `Shared` that embeds `DB::Jars`, thus embedding all the data for each jar.
@@ -127,7 +127,7 @@ In turn, the `salsa::Storage<DB>` type ultimately contains a struct `Shared` tha
 During initialization, each ingredient in the database is assigned a unique index called the [`IngredientIndex`].
 This is a 32-bit number that identifies a particular ingredient from a particular jar.
 
-[`IngredientIndex`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/salsa-2022/src/routes.rs#L5-L9
+[`IngredientIndex`]: https://github.com/salsa-rs/salsa/blob/becaade31e6ebc58cd0505fc1ee4b8df1f39f7de/components/dendro-salsa/src/routes.rs#L5-L9
 
 ### Routes
 
@@ -145,7 +145,7 @@ A `DatabaseKeyIndex` identifies a specific value stored in some specific ingredi
 It combines an [`IngredientIndex`] with a `key_index`, which is a `salsa::Id`:
 
 ```rust,ignore
-{{#include ../../../components/salsa-2022/src/key.rs:DatabaseKeyIndex}}
+{{#include ../../../components/dendro-salsa/src/key.rs:DatabaseKeyIndex}}
 ```
 
 A `DependencyIndex` is similar, but the `key_index` is optional.
@@ -173,7 +173,7 @@ If we had one function ingredient directly invoke a method on `Ingredient<DB>`, 
 We solve this via the `HasJarsDyn` trait. The `HasJarsDyn` trait exports a method that combines the "find ingredient, invoking method" steps into one method:
 
 ```rust,ignore aasaaasdfijjAasdfa
-{{#include ../../../components/salsa-2022/src/storage.rs:HasJarsDyn}}
+{{#include ../../../components/dendro-salsa/src/storage.rs:HasJarsDyn}}
 ```
 
 So, technically, to check if an input has changed, an ingredient:
@@ -190,7 +190,7 @@ The last thing to dicsuss is how the database is initialized.
 The `Default` implementation for `Storage<DB>` does the work:
 
 ```rust,ignore
-{{#include ../../../components/salsa-2022/src/storage.rs:default}}
+{{#include ../../../components/dendro-salsa/src/storage.rs:default}}
 ```
 
 First, it creates an empty `Routes` instance.
@@ -198,13 +198,13 @@ Then it invokes the `DB::create_jars` method.
 The implementation of this method is defined by the `#[salsa::db]` macro; it invokes `salsa::plumbing::create_jars_inplace` to allocate memory for the jars, and then invokes the `Jar::init_jar` method on each of the jars to initialize them:
 
 ```rust,ignore
-{{#include ../../../components/salsa-2022-macros/src/db.rs:create_jars}}
+{{#include ../../../components/dendro-salsa-macros/src/db.rs:create_jars}}
 ```
 
 This implementation for `init_jar` is generated by the `#[salsa::jar]` macro, and simply walks over the representative type for each salsa item and asks *it* to create its ingredients
 
 ```rust,ignore
-{{#include ../../../components/salsa-2022-macros/src/jar.rs:init_jar}}
+{{#include ../../../components/dendro-salsa-macros/src/jar.rs:init_jar}}
 ```
 
 The code to create the ingredients for any particular item is generated by their associated macros (e.g., `#[salsa::tracked]`, `#[salsa::input]`), but it always follows a particular structure.

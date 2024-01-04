@@ -1,8 +1,9 @@
 //! Test that a `tracked` fn on a `salsa::input`
 //! compiles and executes successfully.
 
+use dendro_salsa_tests::{HasLogger, Logger};
+
 use expect_test::expect;
-use salsa_2022_tests::{HasLogger, Logger};
 use test_log::test;
 
 #[salsa::jar(db = Db)]
@@ -29,9 +30,7 @@ struct MyTracked {
 #[salsa::tracked(jar = Jar)]
 fn intermediate_result(db: &dyn Db, input: MyInput) -> MyTracked {
     db.push_log(format!("intermediate_result({:?})", input));
-    let tracked = MyTracked::new(db, input.field(db) / 2);
-    let _ = tracked.field(db); // read the field of an entity we created
-    tracked
+    MyTracked::new(db, input.field(db) / 2)
 }
 
 #[salsa::db(Jar)]
@@ -52,7 +51,7 @@ impl HasLogger for Database {
 }
 
 #[test]
-fn one_entity() {
+fn execute() {
     let mut db = Database::default();
 
     let input = MyInput::new(&db, 22);

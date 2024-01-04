@@ -1,6 +1,6 @@
 use expect_test::expect;
 use salsa::{Database as SalsaDatabase, DebugWithDb};
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 #[salsa::jar(db = Db)]
 struct Jar(MyInput, MyTracked, tracked_fn, tracked_fn_extra);

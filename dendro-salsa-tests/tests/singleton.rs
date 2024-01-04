@@ -4,7 +4,7 @@
 
 use expect_test::expect;
 use salsa::DebugWithDb;
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 use test_log::test;
 

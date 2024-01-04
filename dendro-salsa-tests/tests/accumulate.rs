@@ -2,7 +2,7 @@
 //!
 //! * entities not created in a revision are deleted, as is any memoized data keyed on them.
 
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 use expect_test::expect;
 use test_log::test;

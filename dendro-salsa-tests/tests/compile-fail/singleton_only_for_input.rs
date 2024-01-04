@@ -2,7 +2,7 @@
 //!
 //! Singleton flags are only allowed for input structs. If applied on any other Salsa struct compilation must fail
 
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 use test_log::test;
 

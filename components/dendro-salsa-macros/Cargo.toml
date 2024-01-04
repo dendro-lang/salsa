@@ -1,5 +1,5 @@
 [package]
-name = "salsa-2022-macros"
+name = "dendro-salsa-macros"
 version = "0.1.0"
 edition = "2021"
 

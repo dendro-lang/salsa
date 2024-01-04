@@ -2,7 +2,7 @@
 //! Then mutate the values so that the tracked function re-executes.
 //! Check that we accumulate the appropriate, new values.
 
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 use expect_test::expect;
 use test_log::test;

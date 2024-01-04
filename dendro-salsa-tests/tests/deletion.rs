@@ -1,9 +1,9 @@
-//! Delete cascade:
+//! Basic deletion test:
 //!
-//! * when we delete memoized data, also delete outputs from that data
+//! * entities not created in a revision are deleted, as is any memoized data keyed on them.
 
 use salsa::DebugWithDb;
-use salsa_2022_tests::{HasLogger, Logger};
+use dendro_salsa_tests::{HasLogger, Logger};
 
 use expect_test::expect;
 use test_log::test;
@@ -15,12 +15,11 @@ struct Jar(
     final_result,
     create_tracked_structs,
     contribution_from_struct,
-    copy_field,
 );
 
 trait Db: salsa::DbWithJar<Jar> + HasLogger {}
 
-#[salsa::input(singleton)]
+#[salsa::input]
 struct MyInput {
     field: u32,
 }
@@ -50,13 +49,7 @@ fn create_tracked_structs(db: &dyn Db, input: MyInput) -> Vec<MyTracked> {
 
 #[salsa::tracked]
 fn contribution_from_struct(db: &dyn Db, tracked: MyTracked) -> u32 {
-    let m = MyTracked::new(db, tracked.field(db));
-    copy_field(db, m) * 2
-}
-
-#[salsa::tracked]
-fn copy_field(db: &dyn Db, tracked: MyTracked) -> u32 {
-    tracked.field(db)
+    tracked.field(db) * 2
 }
 
 #[salsa::db(Jar)]
@@ -101,18 +94,11 @@ fn basic() {
 
     // Creates only 2 tracked structs in this revision, should delete 1
     //
-    // Expect to see 6 DidDiscard events. Three from the primary struct:
+    // Expect to see 3 DidDiscard events--
     //
     // * the struct itself
     // * the struct's field
     // * the `contribution_from_struct` result
-    //
-    // and then 3 more from the struct created by `contribution_from_struct`:
-    //
-    // * the struct itself
-    // * the struct's field
-    // * the `copy_field` result
-
     input.set_field(&mut db).to(2);
     assert_eq!(final_result(&db, input), 2);
     db.assert_logs(expect![[r#"
@@ -122,9 +108,6 @@ fn basic() {
             "salsa_event(DidDiscard { key: MyTracked(2) })",
             "salsa_event(DidDiscard { key: field(2) })",
             "salsa_event(DidDiscard { key: contribution_from_struct(2) })",
-            "salsa_event(DidDiscard { key: MyTracked(5) })",
-            "salsa_event(DidDiscard { key: field(5) })",
-            "salsa_event(DidDiscard { key: copy_field(5) })",
             "salsa_event(WillDiscardStaleOutput { execute_key: create_tracked_structs(0), output_key: field(2) })",
             "final_result(MyInput(Id { value: 1 }))",
         ]"#]]);

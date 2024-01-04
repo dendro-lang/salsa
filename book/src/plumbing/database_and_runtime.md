@@ -50,13 +50,13 @@ guarantees that we have successfully managed to cancel the other worker threads
 The code to acquire `&mut` access to the database is the `jars_mut` method:
 
 ```rust
-{{#include ../../../components/salsa-2022/src/storage.rs:jars_mut}}
+{{#include ../../../components/dendro-salsa/src/storage.rs:jars_mut}}
 ```
 
 The key initial point is that it invokes `cancel_other_workers` before proceeding:
 
 ```rust
-{{#include ../../../components/salsa-2022/src/storage.rs:cancel_other_workers}}
+{{#include ../../../components/dendro-salsa/src/storage.rs:cancel_other_workers}}
 ```
 
 ## The Salsa runtime
