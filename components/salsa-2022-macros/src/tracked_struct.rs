@@ -152,6 +152,7 @@ impl TrackedStruct {
 
         parse_quote! {
             impl #ident {
+                #[allow(clippy::too_many_arguments)]
                 pub fn #constructor_name(__db: &#db_dyn_ty, #(#all_field_names: #all_field_tys,)*) -> Self
                 {
                     let (__jar, __runtime) = <_ as salsa::storage::HasJar<#jar_ty>>::jar(__db);

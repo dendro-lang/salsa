@@ -4,7 +4,7 @@ use crate::storage::HasJars;
 
 /// Initializes the `DB`'s jars in-place
 ///
-/// # Safety:
+/// # Safety
 ///
 /// `init` must fully initialize all of jars fields
 pub unsafe fn create_jars_inplace<DB: HasJars>(init: impl FnOnce(*mut DB::Jars)) -> Box<DB::Jars> {
